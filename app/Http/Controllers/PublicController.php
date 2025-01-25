@@ -11,7 +11,7 @@ class PublicController extends Controller
 
     public function index()
     {
-        $products = Product::orderBy('created_at','desc')->paginate(20);
+        $products = Product::orderBy('created_at','desc')->get();
 
         return view('product',[
             'products' =>$products
@@ -21,7 +21,7 @@ class PublicController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
+           $productValidated = $request->validate([
                 'product_name' => 'required|string',
                 'quantity' => 'required|integer',
                 'price' => 'required|numeric',
@@ -40,7 +40,7 @@ class PublicController extends Controller
             $products[] = $data;
             Storage::put($jsonFile,json_encode($products));
 
-            Product::create($data);
+            Product::create($productValidated);
 
             $request->session()->flash('success', 'Product created successfully');
         } catch (\Exception $e){
@@ -52,6 +52,7 @@ class PublicController extends Controller
 
         return redirect()->back();
     }
+
 
     public function edit(Request $request, $pid)
     {
